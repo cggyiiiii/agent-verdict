@@ -1,0 +1,47 @@
+{
+  "name": "agent-verdict",
+  "version": "0.1.0",
+  "description": "DevTools for agent authorization — see exactly why every tool call was allowed or denied",
+  "keywords": [
+    "mcp",
+    "agents",
+    "observability",
+    "authorization",
+    "debugging",
+    "model-context-protocol"
+  ],
+  "license": "MIT",
+  "author": "Mr.G",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "verdict": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "dashboard",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsc --watch",
+    "start": "node dist/cli.js start",
+    "demo": "node dist/cli.js demo"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}

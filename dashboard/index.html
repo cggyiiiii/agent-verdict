@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verdict — agent authorization timeline</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">⚖</span>
+      <span class="name">Verdict</span>
+      <span class="tag">why was my agent blocked?</span>
+    </div>
+    <div class="controls">
+      <select id="session-select" title="session"></select>
+      <div class="filters" id="filters">
+        <button data-f="all" class="active">All</button>
+        <button data-f="allow">Allowed</button>
+        <button data-f="deny">Denied</button>
+        <button data-f="error">Errors</button>
+      </div>
+      <input id="search" type="search" placeholder="filter by tool / reason…" />
+      <button id="replay-open" class="ghost" title="step through a session decision by decision">⏱ replay</button>
+      <span id="live" class="live">● live</span>
+    </div>
+  </header>
+
+  <div id="replay-bar" class="replay-bar hidden">
+    <button id="replay-toggle" title="time-travel replay">▶ replay</button>
+    <input id="replay-slider" type="range" min="0" max="0" value="0" />
+    <span id="replay-pos" class="replay-pos"></span>
+    <button id="replay-exit" class="ghost">exit</button>
+  </div>
+
+  <main>
+    <section id="timeline">
+      <div id="stats" class="stats"></div>
+      <div id="burndown" class="burndown hidden"></div>
+      <ol id="events"></ol>
+      <div id="empty" class="empty">
+        <p>No events yet.</p>
+        <p class="hint">Wrap your MCP client and run your agent:</p>
+        <pre>import { observe } from 'agent-verdict';
+const client = observe(mcpClient, { agent: 'my-agent' });</pre>
+        <p class="hint">…or run <code>npx verdict demo</code> to see a sample session.</p>
+      </div>
+    </section>
+    <aside id="detail">
+      <div class="placeholder">Select an event to see <b>why</b>.</div>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
