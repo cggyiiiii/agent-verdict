@@ -1,10 +1,11 @@
 /* Verdict dashboard — vanilla JS, no build step. */
 (() => {
+  const params = new URLSearchParams(location.search);
   const state = {
     events: [],
     filter: 'all',
     search: '',
-    session: '',     // '' = all sessions
+    session: params.get('session') ?? '',   // '' = all sessions; shareable via ?session=
     selected: null,
     replay: { active: false, cursor: 0, playing: false, timer: null },
   };
@@ -325,18 +326,29 @@
   // initial load + live stream
   fetch('/api/events').then((r) => r.json()).then(({ events }) => {
     state.events = events;
+    // land the user on the first answer they came for: the latest deny in scope
+    const scope = state.session ? events.filter((e) => e.sessionId === state.session) : events;
+    const firstDeny = [...scope].reverse().find((e) => e.decision === 'deny');
+    if (firstDeny) state.selected = firstDeny.id;
     renderList();
     renderSessions();
     renderBurndown();
+    renderDetail();
   }).catch(() => {});
 
-  const es = new EventSource('/api/stream');
-  let sessionRefresh = null;
-  es.onmessage = (msg) => {
-    try { add(JSON.parse(msg.data)); } catch {}
-    clearTimeout(sessionRefresh);
-    sessionRefresh = setTimeout(renderSessions, 500);
-  };
-  es.onopen = () => { liveEl.textContent = '● live'; liveEl.classList.remove('off'); };
-  es.onerror = () => { liveEl.textContent = '○ offline'; liveEl.classList.add('off'); };
+  // ?snapshot disables the live stream (static rendering for screenshots/CI)
+  if (new URLSearchParams(location.search).has('snapshot')) {
+    liveEl.textContent = '◌ snapshot';
+    liveEl.classList.add('off');
+  } else {
+    const es = new EventSource('/api/stream');
+    let sessionRefresh = null;
+    es.onmessage = (msg) => {
+      try { add(JSON.parse(msg.data)); } catch {}
+      clearTimeout(sessionRefresh);
+      sessionRefresh = setTimeout(renderSessions, 500);
+    };
+    es.onopen = () => { liveEl.textContent = '● live'; liveEl.classList.remove('off'); };
+    es.onerror = () => { liveEl.textContent = '○ offline'; liveEl.classList.add('off'); };
+  }
 })();
